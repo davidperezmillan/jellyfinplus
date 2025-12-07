@@ -1,10 +1,8 @@
 package com.davidperezmillan.jellyfinplus.infrastructure.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 @ConfigurationProperties(prefix = "jellyfin")
-@Component
 public class JellyfinConfig {
 
     private String baseUrl = "http://localhost:8096";
