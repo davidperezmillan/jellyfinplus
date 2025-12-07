@@ -40,18 +40,4 @@ class SeriesControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(series)));
     }
-
-    @Test
-    void getDownloadedSeries_shouldReturnDownloadedSeriesList() throws Exception {
-        // Given
-        List<Series> downloadedSeries = List.of(
-                new Series("1", "Series 1", "Overview 1", true)
-        );
-        when(seriesService.getDownloadedSeries()).thenReturn(downloadedSeries);
-
-        // When & Then
-        mockMvc.perform(get("/api/series/downloaded"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(downloadedSeries)));
-    }
 }

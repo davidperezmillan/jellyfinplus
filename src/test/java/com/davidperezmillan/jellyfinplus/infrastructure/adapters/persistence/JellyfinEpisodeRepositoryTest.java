@@ -37,19 +37,4 @@ class JellyfinEpisodeRepositoryTest {
         // Then
         assertThat(result).isEqualTo(expectedEpisodes);
     }
-
-    @Test
-    void findDownloaded_shouldReturnDownloadedEpisodesFromApiClient() {
-        // Given
-        List<Episode> expectedDownloaded = List.of(
-                new Episode("1", "Episode 1", "Overview 1", "series1", 1, 1, true, false)
-        );
-        when(apiClient.getAllEpisodes()).thenReturn(expectedDownloaded);
-
-        // When
-        List<Episode> result = repository.findDownloaded();
-
-        // Then
-        assertThat(result).isEqualTo(expectedDownloaded);
-    }
 }

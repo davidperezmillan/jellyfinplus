@@ -18,7 +18,5 @@ public class SeriesService {
         return seriesRepository.findAll();
     }
 
-    public List<Series> getDownloadedSeries() {
-        return seriesRepository.findDownloaded();
-    }
+
 }

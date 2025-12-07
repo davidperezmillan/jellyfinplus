@@ -20,8 +20,5 @@ public class JellyfinSeriesRepository implements SeriesRepository {
         return apiClient.getSeries();
     }
 
-    @Override
-    public List<Series> findDownloaded() {
-        return apiClient.getSeries().stream().filter(Series::isDownloaded).toList();
-    }
+
 }

@@ -37,21 +37,4 @@ class SeriesServiceTest {
         // Then
         assertThat(result).isEqualTo(expectedSeries);
     }
-
-    @Test
-    void getDownloadedSeries_shouldReturnDownloadedSeries() {
-        // Given
-        List<Series> allSeries = List.of(
-                new Series("1", "Series 1", "Overview 1", true),
-                new Series("2", "Series 2", "Overview 2", false)
-        );
-        List<Series> expectedDownloaded = List.of(allSeries.get(0));
-        when(seriesRepository.findDownloaded()).thenReturn(expectedDownloaded);
-
-        // When
-        List<Series> result = seriesService.getDownloadedSeries();
-
-        // Then
-        assertThat(result).isEqualTo(expectedDownloaded);
-    }
 }

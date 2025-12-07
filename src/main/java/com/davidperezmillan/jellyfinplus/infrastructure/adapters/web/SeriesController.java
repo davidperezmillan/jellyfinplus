@@ -24,9 +24,5 @@ public class SeriesController {
         return seriesService.getAllSeries();
     }
 
-    @GetMapping("/downloaded")
-    @Operation(summary = "Obtener series descargadas", description = "Recupera solo las series que están descargadas localmente")
-    public List<Series> getDownloadedSeries() {
-        return seriesService.getDownloadedSeries();
-    }
+
 }
