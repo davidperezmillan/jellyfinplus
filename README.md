@@ -50,3 +50,8 @@ Or set the following environment variables:
 2. Run: `java -jar target/jellyfinplus-1.0-SNAPSHOT.jar`
 
 Or with Docker: `docker-compose up --build`
+
+## Running Tests
+
+- Unit tests: `mvn test`
+- Integration tests (with real Jellyfin instance): `mvn test -Dtest=JellyfinIntegrationTest`
