@@ -30,8 +30,9 @@ La aplicación sigue los principios de la **arquitectura hexagonal** (también c
 ## Tecnologías
 
 - **Java 21**: Versión moderna de Java con características avanzadas.
-- **Spring Boot 3.4.0**: Framework para desarrollo rápido de aplicaciones (última versión estable).
+- **Spring Boot 3.3.0**: Framework para desarrollo rápido de aplicaciones.
 - **SpringDoc OpenAPI**: Generación automática de documentación Swagger.
+- **Lombok**: Reducción de código boilerplate con anotaciones.
 - **Docker**: Contenedorización para despliegue fácil.
 - **JUnit 5 & Mockito**: Pruebas unitarias y de integración.
 
@@ -114,24 +115,26 @@ Este proyecto está bajo la licencia MIT. Ver el archivo LICENSE para más detal
 
 ## Logging
 
-La aplicación incluye trazas de log completas en todos los niveles:
+La aplicación utiliza **Lombok** con la anotación `@Slf4j` para simplificar el logging:
 
-- **Controladores REST**: Logs de todas las peticiones HTTP entrantes
-- **Servicios de aplicación**: Logs de operaciones de negocio
-- **Cliente API de Jellyfin**: Logs detallados de peticiones REST, respuestas y errores
-- **Configuración**: Archivo `logback-spring.xml` con niveles configurables
+- **Lombok @Slf4j**: Genera automáticamente el logger en cada clase
+- **SLF4J + Logback**: Backend de logging (incluido en Spring Boot)
+- **Configuración centralizada**: En `application.yml`
 
 ### Niveles de Log
 
 - **INFO**: Operaciones principales y respuestas de API
-- **DEBUG**: Detalles de peticiones HTTP y configuración
-- **TRACE**: Datos completos de respuestas JSON
+- **DEBUG**: Detalles de peticiones HTTP, configuración y procesamiento
+- **TRACE**: Datos completos de respuestas JSON (si se habilita)
 - **ERROR**: Errores con stacktrace completo
 
-### Archivos de Log
+### Configuración
 
-- `logs/jellyfinplus.log`: Logs generales de la aplicación
-- `logs/rest-api.log`: Logs específicos de las APIs REST
-- Los archivos rotan diariamente y se limitan en tamaño
+El logging se configura en `src/main/resources/application.yml`:
+- Logs de aplicación en nivel DEBUG
+- Archivo de log: `logs/jellyfinplus.log`
+- Rotación diaria con histórico de 30 días
+- Tamaño máximo por archivo: 10MB
+- Tamaño total máximo: 300MB
 
-Para cambiar niveles de log, modifica `src/main/resources/logback-spring.xml`.
+Para cambiar niveles de log, modifica el archivo `application.yml`.

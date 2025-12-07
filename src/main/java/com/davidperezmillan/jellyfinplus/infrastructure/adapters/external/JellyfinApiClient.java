@@ -5,8 +5,7 @@ import com.davidperezmillan.jellyfinplus.domain.model.Series;
 import com.davidperezmillan.jellyfinplus.infrastructure.config.JellyfinConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,10 +16,10 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Component
 public class JellyfinApiClient {
 
-    private static final Logger log = LoggerFactory.getLogger(JellyfinApiClient.class);
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
