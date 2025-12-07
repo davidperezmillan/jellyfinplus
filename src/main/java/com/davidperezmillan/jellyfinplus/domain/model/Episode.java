@@ -17,6 +17,8 @@ public record Episode(
     @Schema(description = "Número de episodio", example = "1")
     int episodeNumber,
     @Schema(description = "Indica si el episodio está descargado localmente", example = "true")
-    boolean isDownloaded
+    boolean isDownloaded,
+    @Schema(description = "Indica si el episodio ha sido visto", example = "false")
+    boolean isPlayed
 ) {
 }

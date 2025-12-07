@@ -27,7 +27,7 @@ class JellyfinEpisodeRepositoryTest {
         // Given
         String seriesId = "series1";
         List<Episode> expectedEpisodes = List.of(
-                new Episode("1", "Episode 1", "Overview 1", seriesId, 1, 1, true)
+                new Episode("1", "Episode 1", "Overview 1", seriesId, 1, 1, true, false)
         );
         when(apiClient.getEpisodes(seriesId)).thenReturn(expectedEpisodes);
 
@@ -42,7 +42,7 @@ class JellyfinEpisodeRepositoryTest {
     void findDownloaded_shouldReturnDownloadedEpisodesFromApiClient() {
         // Given
         List<Episode> expectedDownloaded = List.of(
-                new Episode("1", "Episode 1", "Overview 1", "series1", 1, 1, true)
+                new Episode("1", "Episode 1", "Overview 1", "series1", 1, 1, true, false)
         );
         when(apiClient.getAllEpisodes()).thenReturn(expectedDownloaded);
 

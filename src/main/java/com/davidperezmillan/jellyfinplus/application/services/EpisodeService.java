@@ -18,7 +18,9 @@ public class EpisodeService {
         return episodeRepository.findBySeriesId(seriesId);
     }
 
-    public List<Episode> getDownloadedEpisodes() {
-        return episodeRepository.findDownloaded();
+    public List<Episode> getUnwatchedEpisodesBySeries(String seriesId) {
+        return getEpisodesBySeries(seriesId).stream()
+                .filter(episode -> !episode.isPlayed())
+                .toList();
     }
 }

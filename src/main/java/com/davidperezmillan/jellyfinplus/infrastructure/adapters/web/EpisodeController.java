@@ -25,9 +25,9 @@ public class EpisodeController {
         return episodeService.getEpisodesBySeries(seriesId);
     }
 
-    @GetMapping("/downloaded")
-    @Operation(summary = "Obtener episodios descargados", description = "Recupera todos los episodios que están descargados localmente")
-    public List<Episode> getDownloadedEpisodes() {
-        return episodeService.getDownloadedEpisodes();
+    @GetMapping("/series/{seriesId}/unwatched")
+    @Operation(summary = "Obtener episodios no vistos de una serie", description = "Recupera los episodios de una serie específica que no han sido marcados como vistos")
+    public List<Episode> getUnwatchedEpisodesBySeries(@Parameter(description = "ID de la serie") @PathVariable String seriesId) {
+        return episodeService.getUnwatchedEpisodesBySeries(seriesId);
     }
 }

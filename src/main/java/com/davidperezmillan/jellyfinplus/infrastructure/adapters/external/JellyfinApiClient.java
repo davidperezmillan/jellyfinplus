@@ -142,9 +142,13 @@ public class JellyfinApiClient {
                 int seasonNumber = item.get("ParentIndexNumber") != null ? item.get("ParentIndexNumber").asInt() : 0;
                 int episodeNumber = item.get("IndexNumber") != null ? item.get("IndexNumber").asInt() : 0;
                 boolean downloaded = item.get("Path") != null;
-                episodes.add(new Episode(id, name, overview, seriesId, seasonNumber, episodeNumber, downloaded));
-                log.trace("Added episode: S{}E{} - {} (ID: {}, Downloaded: {})",
-                        seasonNumber, episodeNumber, name, id, downloaded);
+                boolean played = false;
+                if (item.has("UserData") && item.get("UserData").has("Played")) {
+                    played = item.get("UserData").get("Played").asBoolean();
+                }
+                episodes.add(new Episode(id, name, overview, seriesId, seasonNumber, episodeNumber, downloaded, played));
+                log.trace("Added episode: S{}E{} - {} (ID: {}, Downloaded: {}, Played: {})",
+                        seasonNumber, episodeNumber, name, id, downloaded, played);
             }
             log.info("Successfully fetched {} episodes for series ID: {}", episodes.size(), seriesId);
             return episodes;
@@ -177,9 +181,13 @@ public class JellyfinApiClient {
                 int seasonNumber = item.get("ParentIndexNumber") != null ? item.get("ParentIndexNumber").asInt() : 0;
                 int episodeNumber = item.get("IndexNumber") != null ? item.get("IndexNumber").asInt() : 0;
                 boolean downloaded = item.get("Path") != null;
-                episodes.add(new Episode(id, name, overview, seriesId, seasonNumber, episodeNumber, downloaded));
-                log.trace("Added episode: S{}E{} - {} (Series ID: {}, Downloaded: {})",
-                        seasonNumber, episodeNumber, name, seriesId, downloaded);
+                boolean played = false;
+                if (item.has("UserData") && item.get("UserData").has("Played")) {
+                    played = item.get("UserData").get("Played").asBoolean();
+                }
+                episodes.add(new Episode(id, name, overview, seriesId, seasonNumber, episodeNumber, downloaded, played));
+                log.trace("Added episode: S{}E{} - {} (Series ID: {}, Downloaded: {}, Played: {})",
+                        seasonNumber, episodeNumber, name, seriesId, downloaded, played);
             }
             log.info("Successfully fetched {} episodes in total", episodes.size());
             return episodes;

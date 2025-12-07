@@ -27,8 +27,8 @@ class EpisodeServiceTest {
         // Given
         String seriesId = "series1";
         List<Episode> expectedEpisodes = List.of(
-                new Episode("1", "Episode 1", "Overview 1", seriesId, 1, 1, true),
-                new Episode("2", "Episode 2", "Overview 2", seriesId, 1, 2, false)
+                new Episode("1", "Episode 1", "Overview 1", seriesId, 1, 1, true, false),
+                new Episode("2", "Episode 2", "Overview 2", seriesId, 1, 2, false, true)
         );
         when(episodeRepository.findBySeriesId(seriesId)).thenReturn(expectedEpisodes);
 
@@ -40,17 +40,24 @@ class EpisodeServiceTest {
     }
 
     @Test
-    void getDownloadedEpisodes_shouldReturnDownloadedEpisodes() {
+    void getUnwatchedEpisodesBySeries_shouldReturnOnlyUnwatchedEpisodes() {
         // Given
-        List<Episode> expectedDownloaded = List.of(
-                new Episode("1", "Episode 1", "Overview 1", "series1", 1, 1, true)
+        String seriesId = "series1";
+        List<Episode> allEpisodes = List.of(
+                new Episode("1", "Episode 1", "Overview 1", seriesId, 1, 1, true, false),
+                new Episode("2", "Episode 2", "Overview 2", seriesId, 1, 2, false, true),
+                new Episode("3", "Episode 3", "Overview 3", seriesId, 1, 3, true, false)
         );
-        when(episodeRepository.findDownloaded()).thenReturn(expectedDownloaded);
+        List<Episode> expectedUnwatched = List.of(
+                new Episode("1", "Episode 1", "Overview 1", seriesId, 1, 1, true, false),
+                new Episode("3", "Episode 3", "Overview 3", seriesId, 1, 3, true, false)
+        );
+        when(episodeRepository.findBySeriesId(seriesId)).thenReturn(allEpisodes);
 
         // When
-        List<Episode> result = episodeService.getDownloadedEpisodes();
+        List<Episode> result = episodeService.getUnwatchedEpisodesBySeries(seriesId);
 
         // Then
-        assertThat(result).isEqualTo(expectedDownloaded);
+        assertThat(result).isEqualTo(expectedUnwatched);
     }
 }

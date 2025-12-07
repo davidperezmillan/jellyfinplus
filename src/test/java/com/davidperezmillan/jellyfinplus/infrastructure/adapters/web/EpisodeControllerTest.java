@@ -32,7 +32,7 @@ class EpisodeControllerTest {
         // Given
         String seriesId = "series1";
         List<Episode> episodes = List.of(
-                new Episode("1", "Episode 1", "Overview 1", seriesId, 1, 1, true)
+                new Episode("1", "Episode 1", "Overview 1", seriesId, 1, 1, true, false)
         );
         when(episodeService.getEpisodesBySeries(seriesId)).thenReturn(episodes);
 
@@ -43,16 +43,18 @@ class EpisodeControllerTest {
     }
 
     @Test
-    void getDownloadedEpisodes_shouldReturnDownloadedEpisodesList() throws Exception {
+    void getUnwatchedEpisodesBySeries_shouldReturnUnwatchedEpisodesList() throws Exception {
         // Given
-        List<Episode> downloadedEpisodes = List.of(
-                new Episode("1", "Episode 1", "Overview 1", "series1", 1, 1, true)
+        String seriesId = "series1";
+        List<Episode> unwatchedEpisodes = List.of(
+                new Episode("1", "Episode 1", "Overview 1", seriesId, 1, 1, true, false),
+                new Episode("3", "Episode 3", "Overview 3", seriesId, 1, 3, true, false)
         );
-        when(episodeService.getDownloadedEpisodes()).thenReturn(downloadedEpisodes);
+        when(episodeService.getUnwatchedEpisodesBySeries(seriesId)).thenReturn(unwatchedEpisodes);
 
         // When & Then
-        mockMvc.perform(get("/api/episodes/downloaded"))
+        mockMvc.perform(get("/api/episodes/series/{seriesId}/unwatched", seriesId))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(downloadedEpisodes)));
+                .andExpect(content().json(objectMapper.writeValueAsString(unwatchedEpisodes)));
     }
 }
