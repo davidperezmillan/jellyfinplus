@@ -1,57 +1,113 @@
 # JellyfinPlus
 
-A Spring Boot application for Jellyfin instance management, built with hexagonal architecture.
+JellyfinPlus es una aplicación Spring Boot diseñada para interactuar con instancias de Jellyfin, proporcionando una API REST para gestionar series y episodios. Está construida siguiendo la arquitectura hexagonal (puertos y adaptadores) para garantizar la separación de responsabilidades, escalabilidad y facilidad de mantenimiento.
 
-## Features
+## Características
 
-- Retrieve series from Jellyfin
-- Retrieve episodes of a specific series
-- Retrieve downloaded series and episodes
+- **Recuperación de series**: Obtiene todas las series disponibles en la instancia de Jellyfin.
+- **Recuperación de episodios**: Obtiene los episodios de una serie específica.
+- **Filtrado de contenido descargado**: Identifica series y episodios que están almacenados localmente (descargados).
+- **Documentación interactiva**: Swagger UI para explorar y probar la API.
+- **Arquitectura escalable**: Diseño hexagonal que facilita la adición de nuevas funcionalidades.
 
-## Architecture
+## Arquitectura
 
-- **Domain**: Business logic and entities
-- **Application**: Use cases and services
-- **Infrastructure**: Adapters for web and external APIs
+La aplicación sigue los principios de la **arquitectura hexagonal** (también conocida como puertos y adaptadores), que promueve la separación entre la lógica de negocio y las dependencias externas. Esto permite que el núcleo de la aplicación sea independiente de frameworks específicos y facilita las pruebas y la evolución.
 
-## Technologies
+### Capas
 
-- Java 21
-- Spring Boot 3.3.0
-- Docker
+- **Dominio (Domain)**: Contiene las entidades de negocio (Series, Episode), interfaces de repositorio (ports) y lógica pura. Esta capa es independiente de cualquier framework.
+- **Aplicación (Application)**: Contiene los servicios de aplicación que orquestan la lógica de negocio, utilizando los puertos definidos en el dominio.
+- **Infraestructura (Infrastructure)**: Contiene los adaptadores que implementan los puertos. Incluye controladores REST, clientes externos (como el cliente de Jellyfin) y configuraciones.
 
-## Configuration
+### Beneficios de la Arquitectura Hexagonal
 
-Create a `.env` file in the root directory with the following variables:
+- **Testabilidad**: Fácil mocking de dependencias externas.
+- **Mantenibilidad**: Cambios en frameworks o APIs externas no afectan el núcleo.
+- **Escalabilidad**: Nuevas funcionalidades se pueden agregar sin modificar el código existente.
+- **Independencia**: El dominio no depende de Spring, bases de datos o APIs externas.
+
+## Tecnologías
+
+- **Java 21**: Versión moderna de Java con características avanzadas.
+- **Spring Boot 3.3.0**: Framework para desarrollo rápido de aplicaciones.
+- **SpringDoc OpenAPI**: Generación automática de documentación Swagger.
+- **Docker**: Contenedorización para despliegue fácil.
+- **JUnit 5 & Mockito**: Pruebas unitarias y de integración.
+
+## Configuración
+
+Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
 
 ```
-JELLYFIN_BASE_URL=http://your-jellyfin-instance.com/
-JELLYFIN_TOKEN=your-api-token
-JELLYFIN_USER_NAME=your-username
+JELLYFIN_BASE_URL=http://tu-instancia-jellyfin.com/
+JELLYFIN_TOKEN=tu-token-de-api
+JELLYFIN_USER_NAME=tu-nombre-de-usuario
 ```
 
-Or set the following environment variables:
+### Variables de Entorno
 
-- `JELLYFIN_BASE_URL`: Base URL of your Jellyfin instance (default: http://localhost:8096)
-- `JELLYFIN_TOKEN`: Your Jellyfin API token
-- `JELLYFIN_USER_ID`: Your Jellyfin user ID (optional, will be fetched if not provided)
-- `JELLYFIN_USER_NAME`: Your Jellyfin user name (optional, used to find user ID)
+- `JELLYFIN_BASE_URL`: URL base de tu instancia de Jellyfin (por defecto: http://localhost:8096)
+- `JELLYFIN_TOKEN`: Token de API de Jellyfin para autenticación
+- `JELLYFIN_USER_ID`: ID de usuario de Jellyfin (opcional, se obtiene automáticamente si no se proporciona)
+- `JELLYFIN_USER_NAME`: Nombre de usuario de Jellyfin (opcional, usado para encontrar el ID)
 
-## API Endpoints
+## Endpoints de la API
 
-- `GET /api/series`: Get all series
-- `GET /api/series/downloaded`: Get downloaded series
-- `GET /api/episodes/series/{seriesId}`: Get episodes of a series
-- `GET /api/episodes/downloaded`: Get downloaded episodes
+La API proporciona los siguientes endpoints para interactuar con Jellyfin:
 
-## Running
+### Series
 
-1. Build: `mvn clean package`
-2. Run: `java -jar target/jellyfinplus-1.0-SNAPSHOT.jar`
+- `GET /api/series`: Obtiene todas las series disponibles.
+  - Respuesta: Lista de objetos `Series` con id, nombre, descripción y si está descargada.
+- `GET /api/series/downloaded`: Obtiene solo las series descargadas localmente.
+  - Respuesta: Lista filtrada de series descargadas.
 
-Or with Docker: `docker-compose up --build`
+### Episodios
 
-## Running Tests
+- `GET /api/episodes/series/{seriesId}`: Obtiene todos los episodios de una serie específica.
+  - Parámetro: `seriesId` (ID de la serie)
+  - Respuesta: Lista de objetos `Episode` con detalles del episodio.
+- `GET /api/episodes/downloaded`: Obtiene todos los episodios descargados.
+  - Respuesta: Lista de episodios descargados.
 
-- Unit tests: `mvn test`
-- Integration tests (with real Jellyfin instance): `mvn test -Dtest=JellyfinIntegrationTest`
+### Documentación Interactiva
+
+Una vez ejecutada la aplicación, accede a la documentación Swagger en:
+- **Swagger UI**: http://localhost:8080/swagger-ui.html
+- **OpenAPI JSON**: http://localhost:8080/v3/api-docs
+
+Aquí puedes explorar todos los endpoints, ver los esquemas de respuesta y probar las llamadas directamente.
+
+## Ejecución
+
+### Desarrollo Local
+
+1. Clona el repositorio: `git clone https://github.com/davidperezmillan/jellyfinplus.git`
+2. Configura el archivo `.env` con tus credenciales de Jellyfin.
+3. Compila: `mvn clean compile`
+4. Ejecuta: `mvn spring-boot:run`
+
+### Con Docker
+
+1. Construye la imagen: `docker-compose build`
+2. Ejecuta: `docker-compose up`
+
+La aplicación estará disponible en http://localhost:8080
+
+## Pruebas
+
+- **Pruebas unitarias**: `mvn test` (excluye las de integración)
+- **Pruebas de integración**: `mvn test -Dtest=JellyfinIntegrationTest` (conecta a la instancia real de Jellyfin)
+
+## Contribución
+
+Para contribuir:
+1. Crea una rama para tu feature: `git checkout -b feature/nueva-funcionalidad`
+2. Escribe pruebas para tu código.
+3. Asegúrate de que todas las pruebas pasen.
+4. Envía un pull request.
+
+## Licencia
+
+Este proyecto está bajo la licencia MIT. Ver el archivo LICENSE para más detalles.
