@@ -27,6 +27,7 @@ Set the following environment variables:
 - `JELLYFIN_BASE_URL`: Base URL of your Jellyfin instance (default: http://localhost:8096)
 - `JELLYFIN_TOKEN`: Your Jellyfin API token
 - `JELLYFIN_USER_ID`: Your Jellyfin user ID (optional, will be fetched if not provided)
+- `JELLYFIN_USER_NAME`: Your Jellyfin user name (optional, used to find user ID)
 
 ## API Endpoints
 

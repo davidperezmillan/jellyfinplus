@@ -36,6 +36,24 @@ public class JellyfinApiClient {
         if (config.getUserId() != null && !config.getUserId().isEmpty()) {
             return config.getUserId();
         }
+        if (config.getUserName() != null && !config.getUserName().isEmpty()) {
+            // Find user by name
+            String url = config.getBaseUrl() + "/Users";
+            HttpEntity<String> entity = new HttpEntity<>(getHeaders());
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            try {
+                JsonNode root = objectMapper.readTree(response.getBody());
+                for (JsonNode user : root) {
+                    if (config.getUserName().equals(user.get("Name").asText())) {
+                        return user.get("Id").asText();
+                    }
+                }
+                throw new RuntimeException("User not found: " + config.getUserName());
+            } catch (Exception e) {
+                throw new RuntimeException("Error getting user id", e);
+            }
+        }
+        // Default to first user
         String url = config.getBaseUrl() + "/Users";
         HttpEntity<String> entity = new HttpEntity<>(getHeaders());
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
