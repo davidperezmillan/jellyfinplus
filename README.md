@@ -4,19 +4,36 @@ A Spring Boot application for Jellyfin instance management, built with hexagonal
 
 ## Features
 
-- REST API for media management
+- Retrieve series from Jellyfin
+- Retrieve episodes of a specific series
+- Retrieve downloaded series and episodes
 
 ## Architecture
 
 - **Domain**: Business logic and entities
 - **Application**: Use cases and services
-- **Infrastructure**: Adapters for web and persistence
+- **Infrastructure**: Adapters for web and external APIs
 
 ## Technologies
 
 - Java 21
 - Spring Boot 3.3.0
 - Docker
+
+## Configuration
+
+Set the following environment variables:
+
+- `JELLYFIN_BASE_URL`: Base URL of your Jellyfin instance (default: http://localhost:8096)
+- `JELLYFIN_TOKEN`: Your Jellyfin API token
+- `JELLYFIN_USER_ID`: Your Jellyfin user ID (optional, will be fetched if not provided)
+
+## API Endpoints
+
+- `GET /api/series`: Get all series
+- `GET /api/series/downloaded`: Get downloaded series
+- `GET /api/episodes/series/{seriesId}`: Get episodes of a series
+- `GET /api/episodes/downloaded`: Get downloaded episodes
 
 ## Running
 

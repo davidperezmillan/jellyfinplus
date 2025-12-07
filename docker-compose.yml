@@ -5,3 +5,7 @@ services:
     build: .
     ports:
       - "8080:8080"
+    environment:
+      - JELLYFIN_BASE_URL=http://host.docker.internal:8096
+      - JELLYFIN_TOKEN=ee4bf04cad094a7b80d54adc8d7ae4ec
+      - JELLYFIN_USER_ID=
