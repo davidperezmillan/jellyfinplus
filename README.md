@@ -22,7 +22,15 @@ A Spring Boot application for Jellyfin instance management, built with hexagonal
 
 ## Configuration
 
-Set the following environment variables:
+Create a `.env` file in the root directory with the following variables:
+
+```
+JELLYFIN_BASE_URL=http://your-jellyfin-instance.com/
+JELLYFIN_TOKEN=your-api-token
+JELLYFIN_USER_NAME=your-username
+```
+
+Or set the following environment variables:
 
 - `JELLYFIN_BASE_URL`: Base URL of your Jellyfin instance (default: http://localhost:8096)
 - `JELLYFIN_TOKEN`: Your Jellyfin API token
