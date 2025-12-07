@@ -119,22 +119,20 @@ La aplicación utiliza **Lombok** con la anotación `@Slf4j` para simplificar el
 
 - **Lombok @Slf4j**: Genera automáticamente el logger en cada clase
 - **SLF4J + Logback**: Backend de logging (incluido en Spring Boot)
-- **Configuración centralizada**: En `application.yml`
+- **Logs en consola**: Configuración simple sin archivos de log
 
 ### Niveles de Log
 
 - **INFO**: Operaciones principales y respuestas de API
-- **DEBUG**: Detalles de peticiones HTTP, configuración y procesamiento
+- **DEBUG**: Detalles de peticiones HTTP, configuración y procesamiento (nivel de aplicación)
 - **TRACE**: Datos completos de respuestas JSON (si se habilita)
 - **ERROR**: Errores con stacktrace completo
 
 ### Configuración
 
 El logging se configura en `src/main/resources/application.yml`:
-- Logs de aplicación en nivel DEBUG
-- Archivo de log: `logs/jellyfinplus.log`
-- Rotación diaria con histórico de 30 días
-- Tamaño máximo por archivo: 10MB
-- Tamaño total máximo: 300MB
+- Nivel root: INFO
+- Nivel de aplicación: DEBUG
+- Salida: Solo consola
 
 Para cambiar niveles de log, modifica el archivo `application.yml`.
