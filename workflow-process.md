@@ -36,6 +36,10 @@ Este documento explica el proceso de desarrollo, commit, push, release y deploy 
   - `DOCKERHUB_USERNAME`
   - `DOCKERHUB_PASSWORD`
 - **Acciones**:
+  - Checkout del código.
+  - Configuración de JDK 21 con cache de Maven.
+  - Build del JAR con Maven: `mvn clean package -DskipTests`.
+  - Configuración de Docker Buildx.
   - Login en Docker Hub.
   - Build y push de la imagen `${{ secrets.DOCKERHUB_USERNAME }}/jellyfinplus:latest`.
   - Uso de cache para optimizar builds.
