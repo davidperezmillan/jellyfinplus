@@ -109,8 +109,23 @@ Aquí puedes explorar todos los endpoints, ver los esquemas de respuesta y proba
 
 ### Con Docker
 
-1. Construye la imagen: `docker-compose build`
+#### Localmente con archivo .env
+
+1. Copia y configura el archivo `.env`:
+   ```bash
+   cp .env.example .env
+   # Edita .env con tus credenciales
+   ```
 2. Ejecuta: `docker-compose up`
+
+#### En Portainer o sin archivo .env
+
+El `docker-compose.yml` incluye valores por defecto que puedes sobrescribir:
+- `JELLYFIN_BASE_URL`: Por defecto `http://play.davidperezmillan.com/`
+- `JELLYFIN_TOKEN`: Por defecto incluido (cámbialo por seguridad)
+- `JELLYFIN_USER_NAME`: Por defecto `apps`
+
+Para usar tus propios valores en Portainer, añade las variables de entorno en la configuración del stack en Portainer.
 
 La aplicación estará disponible en http://localhost:8080
 
