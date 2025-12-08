@@ -116,8 +116,8 @@ Aquí puedes explorar todos los endpoints, ver los esquemas de respuesta y proba
    cp .env.example .env
    # Edita .env con tus credenciales
    ```
-2. Ejecuta: `docker-compose up`
-
+- **Pruebas unitarias**: `mvn test` (excluye las de integración)
+- **Pruebas de integración**: `mvn test -Dtest=JellyfinIntegrationTest` (conecta a la instancia real de Jellyfin)
 #### En Portainer o sin archivo .env
 
 El `docker-compose.yml` incluye valores por defecto que puedes sobrescribir:
@@ -126,21 +126,6 @@ El `docker-compose.yml` incluye valores por defecto que puedes sobrescribir:
 - `JELLYFIN_USER_NAME`: Por defecto `apps`
 
 Para usar tus propios valores en Portainer, añade las variables de entorno en la configuración del stack en Portainer.
-
-La aplicación estará disponible en http://localhost:8080
-
-## Pruebas
-
-- **Pruebas unitarias**: `mvn test` (excluye las de integración)
-- **Pruebas de integración**: `mvn test -Dtest=JellyfinIntegrationTest` (conecta a la instancia real de Jellyfin)
-
-## Contribución
-
-Para contribuir:
-1. Crea una rama para tu feature: `git checkout -b feature/nueva-funcionalidad`
-2. Escribe pruebas para tu código.
-3. Asegúrate de que todas las pruebas pasen.
-4. Envía un pull request.
 
 ## Licencia
 
