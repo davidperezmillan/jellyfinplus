@@ -2,8 +2,12 @@ version: '3.8'
 
 services:
   jellyfinplus:
-    build: .
+    container_name: ${CONTAINER_NAME}
+    image: ${IMAGE_NAME}:${VERSION}
     ports:
       - "8080:8080"
-    env_file:
-      - .env
+    environment:
+      - JELLYFIN_BASE_URL=${JELLYFIN_BASE_URL}
+      - JELLYFIN_TOKEN=${JELLYFIN_TOKEN}
+      - JELLYFIN_USER_NAME=${JELLYFIN_USER_NAME}
+

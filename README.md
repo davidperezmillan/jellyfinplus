@@ -38,20 +38,38 @@ La aplicación sigue los principios de la **arquitectura hexagonal** (también c
 
 ## Configuración
 
-Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
-
-```
-JELLYFIN_BASE_URL=http://tu-instancia-jellyfin.com/
-JELLYFIN_TOKEN=tu-token-de-api
-JELLYFIN_USER_NAME=tu-nombre-de-usuario
-```
-
 ### Variables de Entorno
 
-- `JELLYFIN_BASE_URL`: URL base de tu instancia de Jellyfin (por defecto: http://localhost:8096)
+Copia el archivo `.env.example` a `.env` y configura tus credenciales:
+
+```bash
+cp .env.example .env
+```
+
+Edita el archivo `.env` con tus valores:
+
+```dotenv
+# Jellyfin Configuration
+JELLYFIN_BASE_URL=http://tu-instancia-jellyfin.com/
+JELLYFIN_TOKEN=tu_token_de_api
+JELLYFIN_USER_NAME=tu_usuario
+
+# Docker Configuration
+CONTAINER_NAME=jellyfinplus
+IMAGE_NAME=tu_dockerhub_username/jellyfinplus
+VERSION=latest
+```
+
+**Importante**: El archivo `.env` está en `.gitignore` para proteger tus credenciales. Nunca lo subas al repositorio.
+
+#### Descripción de Variables
+
+- `JELLYFIN_BASE_URL`: URL base de tu instancia de Jellyfin (incluye el `/` final)
 - `JELLYFIN_TOKEN`: Token de API de Jellyfin para autenticación
-- `JELLYFIN_USER_ID`: ID de usuario de Jellyfin (opcional, se obtiene automáticamente si no se proporciona)
-- `JELLYFIN_USER_NAME`: Nombre de usuario de Jellyfin (opcional, usado para encontrar el ID)
+- `JELLYFIN_USER_NAME`: Nombre de usuario de Jellyfin
+- `CONTAINER_NAME`: Nombre del contenedor Docker (por defecto: jellyfinplus)
+- `IMAGE_NAME`: Nombre de la imagen Docker en formato `usuario/imagen`
+- `VERSION`: Versión/tag de la imagen Docker (por defecto: latest)
 
 ## Endpoints de la API
 
