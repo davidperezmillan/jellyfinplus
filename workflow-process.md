@@ -33,11 +33,11 @@ Este documento explica el proceso de desarrollo, commit, push, release y deploy 
 ## 3. Docker Build and Push (`.github/workflows/docker.yml`)
 - **Trigger**: `push` a `main`/`master`.
 - **Requisitos**: Secretos en el repositorio (Settings > Secrets):
-  - `DOCKER_USERNAME`
-  - `DOCKER_PASSWORD`
+  - `DOCKERHUB_USERNAME`
+  - `DOCKERHUB_PASSWORD`
 - **Acciones**:
   - Login en Docker Hub.
-  - Build y push de la imagen `${{ secrets.DOCKER_USERNAME }}/jellyfinplus:latest`.
+  - Build y push de la imagen `${{ secrets.DOCKERHUB_USERNAME }}/jellyfinplus:latest`.
   - Uso de cache para optimizar builds.
 - **Nota**: Asegúrate de que los secretos estén configurados correctamente.
 
@@ -67,7 +67,7 @@ Este documento explica el proceso de desarrollo, commit, push, release y deploy 
 - **Nota**: Asegúrate de que la variable esté configurada correctamente en el repositorio.
 
 ## Checklist antes de hacer push para liberar/deploy
-- [ ] Secretos configurados: `DOCKER_USERNAME`, `DOCKER_PASSWORD`.
+- [ ] Secretos configurados: `DOCKERHUB_USERNAME`, `DOCKERHUB_PASSWORD`.
 - [ ] Variable de repositorio: `WEBHOOKS_STACK_LATEST`.
 - [ ] Tests locales pasan (`mvn test`).
 - [ ] Para releases: Crear tag con `git tag vX.Y.Z` y `git push --tags`.
