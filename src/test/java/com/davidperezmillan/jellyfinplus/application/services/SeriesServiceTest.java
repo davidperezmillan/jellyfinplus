@@ -26,8 +26,8 @@ class SeriesServiceTest {
     void getAllSeries_shouldReturnAllSeries() {
         // Given
         List<Series> expectedSeries = List.of(
-                new Series("1", "Series 1", "Overview 1", true),
-                new Series("2", "Series 2", "Overview 2", false)
+                new Series("1", "Series 1", "Continuing", 9.0, "2008-01-20"),
+                new Series("2", "Series 2", "Ended", 8.5, "2019-05-10")
         );
         when(seriesRepository.findAll()).thenReturn(expectedSeries);
 

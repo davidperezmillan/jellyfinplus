@@ -26,7 +26,7 @@ class JellyfinSeriesRepositoryTest {
     void findAll_shouldReturnAllSeriesFromApiClient() {
         // Given
         List<Series> expectedSeries = List.of(
-                new Series("1", "Series 1", "Overview 1", true)
+                new Series("1", "Series 1", "Continuing", 9.0, "2008-01-20")
         );
         when(apiClient.getSeries()).thenReturn(expectedSeries);
 

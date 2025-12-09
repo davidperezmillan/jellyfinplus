@@ -31,7 +31,7 @@ class SeriesControllerTest {
     void getAllSeries_shouldReturnSeriesList() throws Exception {
         // Given
         List<Series> series = List.of(
-                new Series("1", "Series 1", "Overview 1", true)
+                new Series("1", "Series 1", "Continuing", 9.0, "2008-01-20")
         );
         when(seriesService.getAllSeries()).thenReturn(series);
 

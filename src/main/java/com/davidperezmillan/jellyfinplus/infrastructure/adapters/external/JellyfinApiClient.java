@@ -6,12 +6,8 @@ import com.davidperezmillan.jellyfinplus.infrastructure.config.JellyfinConfig;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,22 +16,19 @@ import java.util.List;
 @Component
 public class JellyfinApiClient {
 
-
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final WebClient webClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final JellyfinConfig config;
 
     public JellyfinApiClient(JellyfinConfig config) {
         this.config = config;
+        this.webClient = WebClient.builder()
+                .baseUrl(config.getBaseUrl())
+                .defaultHeader("X-Emby-Token", config.getToken())
+                .build();
         log.info("Jellyfin API Client initialized with base URL: {}", config.getBaseUrl());
     }
 
-    private HttpHeaders getHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-Emby-Token", config.getToken());
-        log.debug("Headers configured with X-Emby-Token");
-        return headers;
-    }
 
     private String getUserId() {
         log.debug("Obtaining user ID");
@@ -46,15 +39,19 @@ public class JellyfinApiClient {
         if (config.getUserName() != null && !config.getUserName().isEmpty()) {
             log.info("Searching for user by name: {}", config.getUserName());
             // Find user by name
-            String url = config.getBaseUrl() + "/Users";
-            log.debug("GET request to: {}", url);
-            HttpEntity<String> entity = new HttpEntity<>(getHeaders());
+            String url = "/Users";
+            log.debug("GET request to: {}{}", config.getBaseUrl(), url);
             try {
-                ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-                log.debug("Response status: {}", response.getStatusCode());
-                log.trace("Response body: {}", response.getBody());
+                String response = webClient.get()
+                        .uri(url)
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .block();
 
-                JsonNode root = objectMapper.readTree(response.getBody());
+                log.debug("Response received");
+                log.trace("Response body: {}", response);
+
+                JsonNode root = objectMapper.readTree(response);
                 for (JsonNode user : root) {
                     if (config.getUserName().equals(user.get("Name").asText())) {
                         String userId = user.get("Id").asText();
@@ -71,15 +68,19 @@ public class JellyfinApiClient {
         }
         // Default to first user
         log.info("No user ID or name configured, using first available user");
-        String url = config.getBaseUrl() + "/Users";
-        log.debug("GET request to: {}", url);
-        HttpEntity<String> entity = new HttpEntity<>(getHeaders());
+        String url = "/Users";
+        log.debug("GET request to: {}{}", config.getBaseUrl(), url);
         try {
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-            log.debug("Response status: {}", response.getStatusCode());
-            log.trace("Response body: {}", response.getBody());
+            String response = webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-            JsonNode root = objectMapper.readTree(response.getBody());
+            log.debug("Response received");
+            log.trace("Response body: {}", response);
+
+            JsonNode root = objectMapper.readTree(response);
             String userId = root.get(0).get("Id").asText();
             log.info("Using first user with ID: {}", userId);
             return userId;
@@ -92,25 +93,30 @@ public class JellyfinApiClient {
     public List<Series> getSeries() {
         log.info("Fetching all series from Jellyfin");
         String userId = getUserId();
-        String url = config.getBaseUrl() + "/Users/" + userId + "/Items?IncludeItemTypes=Series&Recursive=true";
-        log.debug("GET request to: {}", url);
+        String url = "/Users/" + userId + "/Items?IncludeItemTypes=Series&Recursive=true";
+        log.debug("GET request to: {}{}", config.getBaseUrl(), url);
 
-        HttpEntity<String> entity = new HttpEntity<>(getHeaders());
         try {
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-            log.debug("Response status: {}", response.getStatusCode());
-            log.trace("Response body: {}", response.getBody());
+            String response = webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-            JsonNode root = objectMapper.readTree(response.getBody());
+            log.debug("Response received");
+            log.trace("Response body: {}", response);
+
+            JsonNode root = objectMapper.readTree(response);
             JsonNode items = root.get("Items");
             List<Series> series = new ArrayList<>();
             for (JsonNode item : items) {
                 String id = item.get("Id").asText();
                 String name = item.get("Name").asText();
-                String overview = item.get("Overview") != null ? item.get("Overview").asText() : "";
-                boolean downloaded = item.get("Path") != null;
-                series.add(new Series(id, name, overview, downloaded));
-                log.trace("Added series: {} (ID: {}, Downloaded: {})", name, id, downloaded);
+                double communityRating = item.get("CommunityRating") != null ? item.get("CommunityRating").asDouble() : 0.0;
+                String premiereDate = item.get("PremiereDate") != null ? item.get("PremiereDate").asText() : "";
+                String status = item.get("Status") != null ? item.get("Status").asText() : "Unknown";
+                series.add(new Series(id, name, status,communityRating, premiereDate));
+                log.trace("Added series: {} (ID: {}, Status: {})", name, id, status);
             }
             log.info("Successfully fetched {} series", series.size());
             return series;
@@ -123,16 +129,20 @@ public class JellyfinApiClient {
     public List<Episode> getEpisodes(String seriesId) {
         log.info("Fetching episodes for series ID: {}", seriesId);
         String userId = getUserId();
-        String url = config.getBaseUrl() + "/Shows/" + seriesId + "/Episodes?UserId=" + userId;
-        log.debug("GET request to: {}", url);
+        String url = "/Shows/" + seriesId + "/Episodes?UserId=" + userId;
+        log.debug("GET request to: {}{}", config.getBaseUrl(), url);
 
-        HttpEntity<String> entity = new HttpEntity<>(getHeaders());
         try {
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-            log.debug("Response status: {}", response.getStatusCode());
-            log.trace("Response body: {}", response.getBody());
+            String response = webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-            JsonNode root = objectMapper.readTree(response.getBody());
+            log.debug("Response received");
+            log.trace("Response body: {}", response);
+
+            JsonNode root = objectMapper.readTree(response);
             JsonNode items = root.get("Items");
             List<Episode> episodes = new ArrayList<>();
             for (JsonNode item : items) {
@@ -161,16 +171,20 @@ public class JellyfinApiClient {
     public List<Episode> getAllEpisodes() {
         log.info("Fetching all episodes from Jellyfin");
         String userId = getUserId();
-        String url = config.getBaseUrl() + "/Users/" + userId + "/Items?IncludeItemTypes=Episode&Recursive=true";
-        log.debug("GET request to: {}", url);
+        String url = "/Users/" + userId + "/Items?IncludeItemTypes=Episode&Recursive=true";
+        log.debug("GET request to: {}{}", config.getBaseUrl(), url);
 
-        HttpEntity<String> entity = new HttpEntity<>(getHeaders());
         try {
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-            log.debug("Response status: {}", response.getStatusCode());
-            log.trace("Response body: {}", response.getBody());
+            String response = webClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
 
-            JsonNode root = objectMapper.readTree(response.getBody());
+            log.debug("Response received");
+            log.trace("Response body: {}", response);
+
+            JsonNode root = objectMapper.readTree(response);
             JsonNode items = root.get("Items");
             List<Episode> episodes = new ArrayList<>();
             for (JsonNode item : items) {

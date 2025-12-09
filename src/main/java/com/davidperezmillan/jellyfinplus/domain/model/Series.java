@@ -8,9 +8,12 @@ public record Series(
     String id,
     @Schema(description = "Nombre de la serie", example = "Breaking Bad")
     String name,
-    @Schema(description = "Descripción o sinopsis de la serie", example = "Una serie sobre un profesor de química...")
-    String overview,
-    @Schema(description = "Indica si la serie está descargada localmente", example = "true")
-    boolean isDownloaded
+    @Schema(description = "Estado actual de la serie", example = "Continuing")
+    String status,
+    @Schema(description = "Calificación comunitaria de la serie", example = "8.5")
+    double communityRating,
+
+    @Schema(description = "Fecha de estreno de la serie", example = "2008-01-20")
+    String premiereDate
 ) {
 }
