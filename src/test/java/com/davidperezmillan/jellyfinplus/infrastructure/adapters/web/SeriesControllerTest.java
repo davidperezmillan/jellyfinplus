@@ -3,6 +3,8 @@ package com.davidperezmillan.jellyfinplus.infrastructure.adapters.web;
 import com.davidperezmillan.jellyfinplus.application.services.SeriesService;
 import com.davidperezmillan.jellyfinplus.application.services.EpisodeService;
 import com.davidperezmillan.jellyfinplus.domain.model.Series;
+import com.davidperezmillan.jellyfinplus.domain.model.Episode;
+import com.davidperezmillan.jellyfinplus.domain.model.SeriesWithEpisodes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -43,5 +46,63 @@ class SeriesControllerTest {
         mockMvc.perform(get("/api/series"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(series)));
+    }
+
+    @Test
+    void getSeriesWithEpisodes_noUnwatchedParam_returnsAllEpisodes() throws Exception {
+        // Given
+        Series s = new Series("1", "Series 1", "Continuing", 9.0, "2008-01-20");
+        List<Series> series = List.of(s);
+        when(seriesService.getAllSeries()).thenReturn(series);
+
+        List<Episode> episodes = new ArrayList<>();
+        episodes.add(new Episode("e1", "Episode 1", "ov", "1", 1, 1, true, true));
+        episodes.add(new Episode("e2", "Episode 2", "ov2", "1", 1, 2, true, false));
+        when(episodeService.getEpisodesBySeries("1")).thenReturn(episodes);
+
+        List<SeriesWithEpisodes> expected = List.of(new SeriesWithEpisodes(s, episodes));
+
+        // When & Then
+        mockMvc.perform(get("/api/series/with-episodes"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expected)));
+    }
+
+    @Test
+    void getSeriesWithEpisodes_unwatchedTrue_returnsOnlyUnwatched() throws Exception {
+        // Given
+        Series s = new Series("1", "Series 1", "Continuing", 9.0, "2008-01-20");
+        List<Series> series = List.of(s);
+        when(seriesService.getAllSeries()).thenReturn(series);
+
+        List<Episode> unwatched = new ArrayList<>();
+        unwatched.add(new Episode("e2", "Episode 2", "ov2", "1", 1, 2, true, false));
+        when(episodeService.getUnwatchedEpisodesBySeries("1")).thenReturn(unwatched);
+
+        List<SeriesWithEpisodes> expected = List.of(new SeriesWithEpisodes(s, unwatched));
+
+        // When & Then
+        mockMvc.perform(get("/api/series/with-episodes").param("unwatched", "true"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expected)));
+    }
+
+    @Test
+    void getSeriesWithEpisodesByTitle_shouldReturnSeriesWithEpisodes() throws Exception {
+        // Given
+        Series s = new Series("1", "Series 1", "Continuing", 9.0, "2008-01-20");
+        List<Series> series = List.of(s);
+        when(seriesService.getAllSeries()).thenReturn(series);
+
+        List<Episode> episodes = new ArrayList<>();
+        episodes.add(new Episode("e1", "Episode 1", "ov", "1", 1, 1, true, false));
+        when(episodeService.getEpisodesBySeries("1")).thenReturn(episodes);
+
+        List<SeriesWithEpisodes> expected = List.of(new SeriesWithEpisodes(s, episodes));
+
+        // When & Then
+        mockMvc.perform(get("/api/series/with-episodes/search").param("title", "Series 1"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(expected)));
     }
 }
