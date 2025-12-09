@@ -1,6 +1,7 @@
 package com.davidperezmillan.jellyfinplus.infrastructure.adapters.web;
 
 import com.davidperezmillan.jellyfinplus.application.services.SeriesService;
+import com.davidperezmillan.jellyfinplus.application.services.EpisodeService;
 import com.davidperezmillan.jellyfinplus.domain.model.Series;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,9 @@ class SeriesControllerTest {
 
     @MockitoBean
     private SeriesService seriesService;
+
+    @MockitoBean
+    private EpisodeService episodeService;
 
     @Autowired
     private ObjectMapper objectMapper;
