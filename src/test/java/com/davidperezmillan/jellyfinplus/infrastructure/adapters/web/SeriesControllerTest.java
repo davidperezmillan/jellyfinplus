@@ -59,8 +59,9 @@ class SeriesControllerTest {
         episodes.add(new Episode("e1", "Episode 1", "ov", "1", 1, 1, true, true));
         episodes.add(new Episode("e2", "Episode 2", "ov2", "1", 1, 2, true, false));
         when(episodeService.getEpisodesBySeries("1")).thenReturn(episodes);
+        when(episodeService.getNextEpisode("1")).thenReturn(null);
 
-        List<SeriesWithEpisodes> expected = List.of(new SeriesWithEpisodes(s, episodes));
+        List<SeriesWithEpisodes> expected = List.of(new SeriesWithEpisodes(s, episodes, null));
 
         // When & Then
         mockMvc.perform(get("/api/series/with-episodes"))
@@ -78,8 +79,9 @@ class SeriesControllerTest {
         List<Episode> unwatched = new ArrayList<>();
         unwatched.add(new Episode("e2", "Episode 2", "ov2", "1", 1, 2, true, false));
         when(episodeService.getUnwatchedEpisodesBySeries("1")).thenReturn(unwatched);
+        when(episodeService.getNextEpisode("1")).thenReturn(null);
 
-        List<SeriesWithEpisodes> expected = List.of(new SeriesWithEpisodes(s, unwatched));
+        List<SeriesWithEpisodes> expected = List.of(new SeriesWithEpisodes(s, unwatched, null));
 
         // When & Then
         mockMvc.perform(get("/api/series/with-episodes").param("unwatched", "true"))
@@ -97,8 +99,9 @@ class SeriesControllerTest {
         List<Episode> episodes = new ArrayList<>();
         episodes.add(new Episode("e1", "Episode 1", "ov", "1", 1, 1, true, false));
         when(episodeService.getEpisodesBySeries("1")).thenReturn(episodes);
+        when(episodeService.getNextEpisode("1")).thenReturn(null);
 
-        List<SeriesWithEpisodes> expected = List.of(new SeriesWithEpisodes(s, episodes));
+        List<SeriesWithEpisodes> expected = List.of(new SeriesWithEpisodes(s, episodes, null));
 
         // When & Then
         mockMvc.perform(get("/api/series/with-episodes/search").param("title", "Series 1"))

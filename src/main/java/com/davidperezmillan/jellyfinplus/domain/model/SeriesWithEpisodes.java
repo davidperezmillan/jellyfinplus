@@ -5,6 +5,5 @@ import java.util.List;
 /**
  * DTO que combina una entidad Series y su lista de Episodes para respuesta de endpoints.
  */
-public record SeriesWithEpisodes(Series series, List<Episode> episodes) {
+public record SeriesWithEpisodes(Series series, List<Episode> episodes, Episode nextEpisode) {
 }
-
