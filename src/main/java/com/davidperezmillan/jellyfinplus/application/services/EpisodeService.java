@@ -34,8 +34,17 @@ public class EpisodeService {
         if (regularEpisodes.isEmpty()) {
             return null; // O un episodio por defecto
         }
-        // Encontrar el episodio con el mayor episodeNumber
-        Episode lastEpisode = regularEpisodes.stream()
+        // Encontrar la temporada con el mayor número
+        int maxSeason = regularEpisodes.stream()
+                .mapToInt(Episode::seasonNumber)
+                .max()
+                .orElse(0);
+        // Filtrar episodios de la última temporada
+        List<Episode> lastSeasonEpisodes = regularEpisodes.stream()
+                .filter(e -> e.seasonNumber() == maxSeason)
+                .toList();
+        // Encontrar el episodio con el mayor episodeNumber en la última temporada
+        Episode lastEpisode = lastSeasonEpisodes.stream()
                 .max(Comparator.comparingInt(Episode::episodeNumber))
                 .orElse(null);
         if (lastEpisode == null) {

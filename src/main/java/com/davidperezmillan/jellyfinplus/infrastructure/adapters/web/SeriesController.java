@@ -29,9 +29,8 @@ import java.util.List;
  * <p>Descripción de {@code nextEpisode}:
  * El campo {@code nextEpisode} representa el siguiente episodio a conseguir para la serie.
  * La determinación de este siguiente episodio se realiza en {@code EpisodeService#getNextEpisode(seriesId)}
- * y sigue la regla: elegir el siguiente episodio por orden absoluto entre todos los episodios disponibles,
- * sin tener en cuenta temporadas ni capítulos especiales. Esta lógica debe ser estanca y escalable,
- * por lo que está implementada y encapsulada en el servicio de episodios.
+ * y sigue la regla: elegir el siguiente episodio de la última temporada disponible,
+ * incrementando el número de episodio en 1 dentro de esa temporada.
  */
 @RestController
 @RequestMapping("/api/series")
