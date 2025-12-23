@@ -154,4 +154,21 @@ class JellyfinApiClientTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Error parsing episodes");
     }
+
+    @Test
+    void getSeries_withNoUserConfigured_usesFirstUser() {
+        // Neither userId nor userName is set
+        String usersJson = "[{\"Id\":\"firstUserId\",\"Name\":\"First User\"}]";
+        String seriesJson = "{\"Items\":[]}";
+
+        when(webClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(String.class))
+                .thenReturn(Mono.just(usersJson))
+                .thenReturn(Mono.just(seriesJson));
+
+        List<Series> result = client.getSeries();
+        assertThat(result).isEmpty();
+    }
 }
