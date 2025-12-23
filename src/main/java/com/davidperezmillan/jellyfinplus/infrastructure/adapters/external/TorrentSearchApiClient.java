@@ -18,7 +18,7 @@ public class TorrentSearchApiClient {
 
     private final WebClient webClient = WebClient.builder()
             .clientConnector(new ReactorClientHttpConnector(
-                    HttpClient.create().responseTimeout(Duration.ofSeconds(30))
+                    HttpClient.create().responseTimeout(Duration.ofSeconds(360))
             ))
             .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)) // 10 MB
             .build();

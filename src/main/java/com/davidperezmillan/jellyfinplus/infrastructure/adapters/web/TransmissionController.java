@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +36,7 @@ import java.util.List;
  * @author David Perez Millan
  * @since 1.0
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/transmission")
 @Tag(name = "Transmission", description = "Operaciones relacionadas con el cliente de torrents Transmission")
@@ -56,14 +58,14 @@ public class TransmissionController {
      * toda la información necesaria para el torrent.</p>
      *
      * @param torrentFile contenido del archivo .torrent codificado en base64. Debe ser una cadena
-     *                   válida en formato base64 que represente un archivo .torrent completo.
+     *                    válida en formato base64 que represente un archivo .torrent completo.
      * @return ResponseEntity con mensaje de confirmación si el torrent se añade correctamente
      * @throws IllegalArgumentException si el archivo torrent es inválido o nulo
      */
     @PostMapping("/torrent")
     @Operation(
-        summary = "Añadir torrent desde archivo",
-        description = "Añade un nuevo torrent al cliente Transmission desde un archivo .torrent codificado en base64"
+            summary = "Añadir torrent desde archivo",
+            description = "Añade un nuevo torrent al cliente Transmission desde un archivo .torrent codificado en base64"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Torrent añadido correctamente al cliente Transmission"),
@@ -84,14 +86,14 @@ public class TransmissionController {
      * necesidad de un archivo .torrent físico.</p>
      *
      * @param request enlace magnet válido que contiene la información del torrent.
-     *                  Debe comenzar con 'magnet:?' y contener los parámetros necesarios.
+     *                Debe comenzar con 'magnet:?' y contener los parámetros necesarios.
      * @return ResponseEntity con mensaje de confirmación si el magnet se añade correctamente
      * @throws IllegalArgumentException si el enlace magnet es inválido o nulo
      */
     @PostMapping("/magnet")
     @Operation(
-        summary = "Añadir torrent desde magnet link",
-        description = "Añade un nuevo torrent al cliente Transmission desde un enlace magnet"
+            summary = "Añadir torrent desde magnet link",
+            description = "Añade un nuevo torrent al cliente Transmission desde un enlace magnet"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Magnet link añadido correctamente al cliente Transmission"),
@@ -99,7 +101,7 @@ public class TransmissionController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor al procesar la solicitud")
     })
     public ResponseEntity<String> addMagnet(
-           @RequestBody TransmissionMagnetRequest request) {
+            @RequestBody TransmissionMagnetRequest request) {
         transmissionService.addMagnet(request.getMagnet());
         return ResponseEntity.ok("Magnet añadido correctamente");
     }
@@ -112,13 +114,13 @@ public class TransmissionController {
      * La respuesta incluye tanto el conteo total de torrents como la lista completa.</p>
      *
      * @return TransmissionRestResponse que contiene el número total de torrents y la lista
-     *         ordenada de objetos Torrent con toda su información (ID, nombre, estado,
-     *         progreso, tamaños, velocidades de descarga/subida)
+     * ordenada de objetos Torrent con toda su información (ID, nombre, estado,
+     * progreso, tamaños, velocidades de descarga/subida)
      */
     @GetMapping("/torrents")
     @Operation(
-        summary = "Listar torrents ordenados por estado",
-        description = "Recupera la lista completa de torrents del cliente Transmission, ordenados alfabéticamente por estado"
+            summary = "Listar torrents ordenados por estado",
+            description = "Recupera la lista completa de torrents del cliente Transmission, ordenados alfabéticamente por estado"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Lista de torrents recuperada y ordenada correctamente"),
@@ -136,24 +138,35 @@ public class TransmissionController {
      * <p>Este endpoint busca torrents en 1337x con categoría 72, subcategoría 1, máximo 10 resultados,
      * y añade automáticamente los enlaces magnet de los resultados a Transmission.</p>
      *
+     * @param maxResults  número máximo de resultados a buscar (opcional, por defecto 10)
+     * @param maxSizeInGB tamaño máximo en GB permitido para los torrents (opcional, por defecto 2 GB)
      * @return ResponseEntity con mensaje indicando cuántos torrents se añadieron
      */
     @PostMapping("/add-torrents")
     @Operation(
-        summary = "Buscar y añadir torrents automáticamente",
-        description = "Recupera torrents desde un sitio de búsqueda preconfigurado y los añade automáticamente a Transmission"
+            summary = "Buscar y añadir torrents automáticamente",
+            description = "Recupera torrents desde un sitio de búsqueda preconfigurado y los añade automáticamente a Transmission"
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Torrents añadidos correctamente"),
             @ApiResponse(responseCode = "500", description = "Error al buscar o añadir torrents")
     })
-    public ResponseEntity<String> addTorrentsFromSearch() {
+    public ResponseEntity<String> addTorrentsFromSearch(
+            @Parameter(description = "Número máximo de resultados a buscar", example = "10")
+            @RequestParam(required = false, defaultValue = "10") int maxResults,
+            @Parameter(description = "Tamaño máximo en GB permitido para los torrents", example = "2")
+            @RequestParam(required = false, defaultValue = "2") long maxSizeInGB) {
 
         try {
             // Valores preconfigurados
             String site = "1337x";
             String category = "72";
-            int maxResults = 10;
+            if (maxResults <= 0) {
+                maxResults = 10;
+            }
+            if (maxSizeInGB <= 0) {
+                maxSizeInGB = 5; // 2GB por defecto
+            }
 
             // Buscar torrents
             List<TorrentSearchResult> results = torrentSearchService.searchTorrents(site, category, null, maxResults);
@@ -161,6 +174,15 @@ public class TransmissionController {
             int addedCount = 0;
             for (TorrentSearchResult result : results) {
                 try {
+
+                    log.info("Intentando añadir torrent: {} de : {}", result.getTitle(), result.getSize());
+
+                    // Verificar tamaño máximo
+                    if (!isSizeWithinLimit(result.getSize(), maxSizeInGB)) {
+                        log.info("Torrent {} descartado por exceder el límite de tamaño ({} GB)", result.getTitle(), maxSizeInGB);
+                        continue;
+                    }
+
                     if (result.getDownload_link() == null || result.getDownload_link().isEmpty()) {
                         continue; // Saltar si no hay enlace de descarga
                     }
@@ -177,4 +199,37 @@ public class TransmissionController {
             return ResponseEntity.internalServerError().body("Error al buscar o añadir torrents: " + e.getMessage());
         }
     }
+
+    /**
+     * Verifica si el tamaño del torrent está dentro del límite especificado en GB.
+     *
+     * @param size        tamaño del torrent como cadena (ej. "1.5GB", "500MB", "800KB")
+     * @param maxSizeInGB límite máximo en gigabytes
+     * @return true si el tamaño está dentro del límite, false en caso contrario
+     */
+    private boolean isSizeWithinLimit(String size, long maxSizeInGB) {
+        if (size == null || size.isBlank()) {
+            return false;
+        }
+        String sizeStr = size.toUpperCase().trim();
+        double sizeInGB;
+        try {
+            if (sizeStr.endsWith("GB")) {
+                sizeInGB = Double.parseDouble(sizeStr.replace("GB", "").trim());
+            } else if (sizeStr.endsWith("MB")) {
+                sizeInGB = Double.parseDouble(sizeStr.replace("MB", "").trim()) / 1024;
+            } else if (sizeStr.endsWith("KB")) {
+                sizeInGB = Double.parseDouble(sizeStr.replace("KB", "").trim()) / (1024 * 1024);
+            } else if (sizeStr.endsWith("TB")) {
+                sizeInGB = Double.parseDouble(sizeStr.replace("TB", "").trim()) * 1024;
+            } else {
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return sizeInGB <= maxSizeInGB;
+    }
+
 }
+
